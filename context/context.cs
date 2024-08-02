@@ -15,7 +15,7 @@ public class Context:DbContext{
         modelBuilder.Entity<libro>(libro =>{
             libro.ToTable("Libro");
             libro.HasKey(p=>p.IdLibro);
-            libro.Property(p=>p.name).IsRequired().HasMaxLength(200);
+            libro.Property(p=>p.name).IsRequired(false).HasMaxLength(200);
             libro.Property(p=>p.author).HasMaxLength(50);
             libro.Property(p => p.date)
                 .HasConversion(

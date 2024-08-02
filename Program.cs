@@ -14,6 +14,9 @@ app.MapGet("/db", async ([FromServices] Context dbContext) => {
     dbContext.Database.EnsureCreated();
     return Results.Ok("Base de datos postgres: " + dbContext.Database.IsNpgsql());
 });
+
+///------CLIENTES------///
+
 //crear cliente
 app.MapPost("/cliente", async([FromServices] Context dbContext, [FromBodyAttribute] cliente clientes)=>{
     clientes.IdCliente = Guid.NewGuid();
@@ -26,6 +29,29 @@ app.MapGet("/cliente", async ([FromServices] Context dbContext) => {
     var info = Results.Ok(dbContext.clientes);
     return info;
 });
+
+//actualizar clientes
+
+app.MapPut("/cliente/{id}", async([FromServices] Context dbContext, [FromBodyAttribute] cliente clientes, [FromRoute] Guid id)=>{
+    var info = dbContext.clientes.Find(id);
+    if(info != null){
+        info.IdCliente = clientes.IdCliente;
+        info.age = clientes.age;
+        info.name = clientes.name;
+        await dbContext.SaveChangesAsync();
+        return Results.Ok(dbContext.clientes.Find(id));
+    }
+    return Results.NotFound();
+});
+
+
+//Obtener por id de cliente
+app.MapGet("/cliente/{id}", async ([FromServices] Context dbContext, [FromRoute] Guid id) => {
+    var info = Results.Ok(dbContext.clientes.Find(id));
+    return info;
+});
+
+//----------LIBROS----------//
 //crear libro
 app.MapPost("/libro", async([FromServices] Context dbContext, [FromBodyAttribute] libro libros)=>{
     libros.IdLibro = Guid.NewGuid();
@@ -39,6 +65,29 @@ app.MapGet("/libro", async ([FromServices] Context dbContext) => {
     return info;
 });
 
+//obtener libro por id
+app.MapGet("/libro/{id}", async([FromServices] Context dbContext, [FromRoute] Guid id )=>{
+    var info = dbContext.libros.Find(id);
+    if(info != null){
+        return Results.Ok(info);
+    }
+    else{
+        return Results.NotFound("No se encontro el cliente con id: "+id);
+    }
+});
+
+//ACTUALIZAR CLEINTES
+app.MapPut("cliente/{id}", async ([FromServices] Context dbContext, [FromRoute] Guid id, [FromBody] cliente clienteUpdate  )=>{
+    var info = dbContext.clientes.Find(id);
+    if(info != null){
+        info.adress = clienteUpdate.adress;
+        info.age = clienteUpdate.age;
+        info.name = clienteUpdate.name;
+        await dbContext.SaveChangesAsync();
+        return Results.Ok(info);
+    }
+    return Results.NotFound("No se encontro el cliente con id: "+id);
+});
 ///---------ORDENES---------///
 
 //crear orden
